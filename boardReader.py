@@ -3,8 +3,6 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.firefox.webdriver import FirefoxProfile
 
-
-
 def openFireFox(webBrowser):
     glassdoor = 'https://www.glassdoor.com/index.htm'
     webBrowser.get(glassdoor)
@@ -21,14 +19,30 @@ def jobLocation(webBrowser, location):
     locationSearch.clear()
     locationSearch.send_keys(location)
 
+def getCompany(webBrowser):
+    return webBrowser.find_element_by_css_selector(".jobInfoItem.jobEmpolyerName").text
+
+def getJobTitle(webBrowser):
+    return webBrowser.find_element_by_css_selector(".jobTitle.h2.strong").text
+
+def getJobLocation(webBrowser):
+    return webBrowser.find_element_by_css_selector(".jobInfoItem.empLoc").text
+
+def getJobSalary(webBrowser):
+    return webBrowser.find_element_by_css_selector(".salaryText").text
 
 def main():
     profile = FirefoxProfile("/home/bobby/.mozilla/firefox/iwp41fb7.default")
     webBrowser = webdriver.Firefox(profile)
     openFireFox(webBrowser)
     jobTitle(webBrowser, "Software Engineer")
-    jobLocation(webBrowser, "San Jose, CA")
+    jobLocation(webBrowser, "Santa Cruz, CA")
     submit = webBrowser.find_element_by_id("HeroSearchButton").click()
+
+    print(getCompany(webBrowser))
+    print(getJobTitle(webBrowser))
+    print(getJobLocation(webBrowser))
+    print(getJobSalary(webBrowser))
 
 if __name__ == '__main__':
     main()
