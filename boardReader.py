@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import time
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.firefox.webdriver import FirefoxProfile
@@ -19,30 +20,45 @@ def jobLocation(webBrowser, location):
     locationSearch.clear()
     locationSearch.send_keys(location)
 
-def getCompany(webBrowser):
-    return webBrowser.find_element_by_css_selector(".jobInfoItem.jobEmpolyerName").text
+def getCompany(webBrowser, num):
+    try:
+        return webBrowser.find_element_by_css_selector(f'li.jl:nth-child({num}) > div:nth-child(2) > div:nth-child(1) > a:nth-child(1) > div:nth-child(1)').text
+    except:
+        return "0"
 
-def getJobTitle(webBrowser):
-    return webBrowser.find_element_by_css_selector(".jobTitle.h2.strong").text
+def getJobTitle(webBrowser, num):
+    try:
+        return webBrowser.find_element_by_css_selector(f'li.jl:nth-child({num}) > div:nth-child(2) > a:nth-child(2)').text
+    except:
+        return "0"
 
-def getJobLocation(webBrowser):
-    return webBrowser.find_element_by_css_selector(".jobInfoItem.empLoc").text
+def getJobLocation(webBrowser, num):
+    try:
+        return webBrowser.find_element_by_css_selector(f"li.jl:nth-child({num}) > div:nth-child(2) > div:nth-child(3) > span:nth-child(1)").text
+    except:
+        return "0"
 
-def getJobSalary(webBrowser):
-    return webBrowser.find_element_by_css_selector(".salaryText").text
+def getJobSalary(webBrowser, num):
+    try:
+        return webBrowser.find_element_by_css_selector(f"li.jl:nth-child({num}) > div:nth-child(2) > div:nth-child(4) > div:nth-child(1) > span:nth-child(1) > span:nth-child(1)").text
+    except:
+        return "0"
 
 def main():
     profile = FirefoxProfile("/home/bobby/.mozilla/firefox/iwp41fb7.default")
     webBrowser = webdriver.Firefox(profile)
     openFireFox(webBrowser)
     jobTitle(webBrowser, "Software Engineer")
-    jobLocation(webBrowser, "Santa Cruz, CA")
+    jobLocation(webBrowser, "San Jose, CA")
     submit = webBrowser.find_element_by_id("HeroSearchButton").click()
 
-    print(getCompany(webBrowser))
-    print(getJobTitle(webBrowser))
-    print(getJobLocation(webBrowser))
-    print(getJobSalary(webBrowser))
+
+    for i in range(1,34):
+        print(getCompany(webBrowser, i))
+        print(getJobTitle(webBrowser, i))
+        print(getJobLocation(webBrowser, i))
+        print(getJobSalary(webBrowser, i))
+        print()
 
 if __name__ == '__main__':
     main()
