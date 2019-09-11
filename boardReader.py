@@ -48,25 +48,30 @@ def nextPage(webBrowser):
     webBrowser.find_element_by_css_selector(".next").click()
 
 def main():
+
+    # Open firefox with my profile so it is already logged in.
     profile = FirefoxProfile("/home/bobby/.mozilla/firefox/iwp41fb7.default")
     webBrowser = webdriver.Firefox(profile)
     openFireFox(webBrowser)
+
+    # TODO: Add user input for job and location in future
     jobTitle(webBrowser, "Software Engineer")
     jobLocation(webBrowser, "San Jose, CA")
     submit = webBrowser.find_element_by_id("HeroSearchButton").click()
 
     pageNum = 1
     while True:
-
         print("--------------------------------")
         print(f"Page {pageNum}")
         print()
+
         for i in range(1,34):
             print(getCompany(webBrowser, i))
             print(getJobTitle(webBrowser, i))
             print(getJobLocation(webBrowser, i))
             print(getJobSalary(webBrowser, i))
             print()
+
         try:
             nextPage(webBrowser)
             pageNum +=1
