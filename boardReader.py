@@ -44,6 +44,9 @@ def getJobSalary(webBrowser, num):
     except:
         return "0"
 
+def nextPage(webBrowser):
+    webBrowser.find_element_by_css_selector(".next").click()
+
 def main():
     profile = FirefoxProfile("/home/bobby/.mozilla/firefox/iwp41fb7.default")
     webBrowser = webdriver.Firefox(profile)
@@ -52,13 +55,24 @@ def main():
     jobLocation(webBrowser, "San Jose, CA")
     submit = webBrowser.find_element_by_id("HeroSearchButton").click()
 
+    pageNum = 1
+    while True:
 
-    for i in range(1,34):
-        print(getCompany(webBrowser, i))
-        print(getJobTitle(webBrowser, i))
-        print(getJobLocation(webBrowser, i))
-        print(getJobSalary(webBrowser, i))
+        print("--------------------------------")
+        print(f"Page {pageNum}")
         print()
+        for i in range(1,34):
+            print(getCompany(webBrowser, i))
+            print(getJobTitle(webBrowser, i))
+            print(getJobLocation(webBrowser, i))
+            print(getJobSalary(webBrowser, i))
+            print()
+        try:
+            nextPage(webBrowser)
+            pageNum +=1
+        except:
+            break
+        print(f"Total Pages: {pageNum}")
 
 if __name__ == '__main__':
     main()
