@@ -1,9 +1,13 @@
 #!/usr/bin/env python
+import psycopg2
 import time
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.firefox.webdriver import FirefoxProfile
+from configparser import ConfigParser
 
+#----------------------------------#
+#         Selenium functions
 def openFireFox(webBrowser):
     glassdoor = 'https://www.glassdoor.com/index.htm'
     webBrowser.get(glassdoor)
@@ -46,6 +50,39 @@ def getJobSalary(webBrowser, num):
 
 def nextPage(webBrowser):
     webBrowser.find_element_by_css_selector(".next").click()
+
+#----------------------------------#
+#           Database functions
+
+def config(filename='database.ini', section = 'postgresql'):
+    parser = ConfigParser()
+    parser.read(filename)
+
+    db = {}
+    if parser.has_section(section):
+        params = parser.items(section)
+        for param in params:
+            db[param[0]] = param[1]
+    else:
+        raise Exception('Section {0} not found in the {1} file'.format(section, filename))
+
+    return db
+
+def connect():
+    conn = None:
+    try:
+        params = config()
+        print("Connecting to database.")
+        return psycopg2.connect(**params)
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(Error)
+
+def disconnect(connection):
+    if connection is not None:
+        conn.close()
+        print("Disconnecting from database.")
+
+#----------------------------------#
 
 def main():
 
