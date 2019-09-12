@@ -1,7 +1,7 @@
-DROP TABLE JobListings;
-CREATE TABLE JobListings(
-    company VARCHAR(32),
+DROP TABLE joblisting;
+CREATE TABLE joblisting(
+    company VARCHAR(64),
     title VARCHAR(64),
-    location VARCHAR(16),
-    salary VARCHAR(16)
+    location VARCHAR(64),
+    salary VARCHAR(64)
 );
