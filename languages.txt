@@ -1,9 +1,14 @@
 java
+apache
+cassandra
 c
 c++
 c/c++
+css
 python
-rocker
+docker
+rest
+restfull
 rust
 ruby
 sql
@@ -15,6 +20,7 @@ cobol
 fortran
 gnu
 haskell
+html
 javascript
 kotlin
 lua
@@ -22,6 +28,8 @@ matlab
 maya
 net.data
 newlisp
+node
+node.js
 ocaml
 pascal
 perl
