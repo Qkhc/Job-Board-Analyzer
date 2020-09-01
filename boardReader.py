@@ -54,22 +54,20 @@ def main():
     options = Options()
     options.headless = True    
     webBrowser = webdriver.Firefox(options=options)
-    # openFireFox(webBrowser)
     URL = "https://www.indeed.com/q-software-engineer-l-Valencia,-CA-jobs.html"
     webBrowser.get(URL)
-    res = webBrowser.find_element_by_id('pj_083b886315193c53')
-    print(res.text)
-    res = res.find_element_by_class_name('company')
-    print(res.text)
+    resultsCol = webBrowser.find_element_by_id('resultsCol')
+    
+    companies = resultsCol.find_elements_by_class_name('company')
+    titles = resultsCol.find_elements_by_class_name("title")
 
-    # print(page.text)
-    # soup = BeautifulSoup(page.content, 'html.parser')
-    # results = soup.find_all("div", id="tab-details")
-    # print(des)
-    # job = results.findAll("div", {"id": "pj_a9af049c355e31ab"})
-    # for job in results:
-    # print(results)
+    for i in range(len(companies)):
+        print("----------")
+        print(companies[i].text)
+        print(titles[i].text.split("\n")[0])
+    
     webBrowser.quit()
+
 if __name__ == '__main__':
     main()
 
