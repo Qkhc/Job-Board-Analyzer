@@ -1,10 +1,9 @@
 #!/usr/bin/env python
-import psycopg2
-import time
 from bs4 import BeautifulSoup
 from selenium import webdriver
-from selenium.webdriver.firefox.webdriver import FirefoxProfile
-from configparser import ConfigParser
+import requests
+import os
+from selenium.webdriver.firefox.options import Options
 
 #----------------------------------#
 #         Selenium functions
@@ -51,92 +50,31 @@ def getJobSalary(webBrowser, num):
 def nextPage(webBrowser):
     webBrowser.find_element_by_css_selector(".next").click()
 
-#----------------------------------#
-#           Database functions
-
-def config(filename='database.ini', section = 'postgresql'):
-    parser = ConfigParser()
-    parser.read(filename)
-
-    db = {}
-    if parser.has_section(section):
-        params = parser.items(section)
-        for param in params:
-            db[param[0]] = param[1]
-    else:
-        raise Exception('Section {0} not found in the {1} file'.format(section, filename))
-
-    return db
-
-def insertListing(connection, listing):
-    try:
-        cur = connection.cursor()
-        sql = """INSERT INTO "public.joblisting"
-                VALUES (%s, %s, %s, %s)"""
-        cur.execute(sql, (listing['company'], listing['title'],
-                          listing['location'], listing['salary']))
-        connection.commit()
-    except Exception as error:
-        print(error)
-    finally:
-        cur.close()
-
-def connect():
-    conn = None
-    try:
-        params = config()
-        conn = psycopg2.connect(**params)
-    except (Exception, psycopg2.DatabaseError) as error:
-        print(error)
-        return
-
-    print("Connecting to database.")
-    return conn
-
-def disconnect(connection):
-    if connection is not None:
-        connection.close()
-        print("Disconnecting from database.")
-
-#----------------------------------#
-
 def main():
+    options = Options()
+    options.headless = True    
+    webBrowser = webdriver.Firefox(options=options)
+    # openFireFox(webBrowser)
+    URL = "https://www.indeed.com/q-software-engineer-l-Valencia,-CA-jobs.html"
+    webBrowser.get(URL)
+    res = webBrowser.find_element_by_id('pj_083b886315193c53')
+    print(res.text)
+    res = res.find_element_by_class_name('company')
+    print(res.text)
 
-    # Open firefox with my profile so it is already logged in.
-    profile = FirefoxProfile("/home/bobby/.mozilla/firefox/iwp41fb7.default")
-    webBrowser = webdriver.Firefox(profile)
-    openFireFox(webBrowser)
-
-    # TODO: Add user input for job and location in future
-    jobTitle(webBrowser, "Software Engineer")
-    jobLocation(webBrowser, "San Jose, CA")
-    submit = webBrowser.find_element_by_id("HeroSearchButton").click()
-
-    # Connecting to postgresql database.
-    conn = connect()
-
-    pageNum = 1
-    while pageNum == 1:
-        print("--------------------------------")
-        print(f"Page {pageNum}")
-        print()
-
-        for i in range(1,34):
-            listing = {
-                "company": f'{getCompany(webBrowser, i)}',
-                "title": f'{getJobTitle(webBrowser, i)}',
-                "location": f'{getJobLocation(webBrowser, i)}',
-                "salary": f'{getJobSalary(webBrowser, i)}'
-            }
-            print(listing)
-            insertListing(conn, listing)
-
-        try:
-            nextPage(webBrowser)
-            pageNum +=1
-        except:
-            break
-    disconnect(conn)
-
+    # print(page.text)
+    # soup = BeautifulSoup(page.content, 'html.parser')
+    # results = soup.find_all("div", id="tab-details")
+    # print(des)
+    # job = results.findAll("div", {"id": "pj_a9af049c355e31ab"})
+    # for job in results:
+    # print(results)
+    webBrowser.quit()
 if __name__ == '__main__':
     main()
+
+
+# indeed id="jobDescriptionText" under auxCol
+# indeed tr role = main
+#td id = resultsCol
+# div id = pj_123456789
