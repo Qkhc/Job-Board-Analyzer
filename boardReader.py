@@ -22,7 +22,7 @@ def printPageInfo(driver, companies, titles):
         print(titles[i].text.split("\n")[0] + "\n")
         companies[i].click()
         driver.switch_to.frame('vjs-container-iframe')
-        time.sleep(3)
+        time.sleep(1.5)
         jobDes = driver.find_element_by_xpath('//*[@id="jobDescriptionText"]')
         print(jobDes.text)
         driver.switch_to.default_content()
