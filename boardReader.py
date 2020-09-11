@@ -14,18 +14,24 @@ def getInfo(results):
 
     return companies, titles
 
-def printPageInfo(driver, companies, titles):
-    
+def printPageInfo(driver, companies, titles):   
     for i in range(len(companies)):
-        print("\n----------- JOB " + str(i+1) + " DESCRIPTION--------------\n")
-        print(companies[i].text)
-        print(titles[i].text.split("\n")[0] + "\n")
-        companies[i].click()
-        driver.switch_to.frame('vjs-container-iframe')
-        time.sleep(1.5)
-        jobDes = driver.find_element_by_xpath('//*[@id="jobDescriptionText"]')
-        print(jobDes.text)
-        driver.switch_to.default_content()
+        try:
+            print("\n----------- JOB " + str(i+1) + " DESCRIPTION--------------\n")
+            print(companies[i].text)
+            print(titles[i].text.split("\n")[0] + "\n")
+            titles[i].click()
+            time.sleep(.5)
+            driver.switch_to.frame('vjs-container-iframe')
+            time.sleep(1.5)
+            jobDes = driver.find_element_by_xpath('//*[@id="jobDescriptionText"]')
+            print(jobDes.text)
+            driver.switch_to.default_content()
+        except Exception as e:
+            driver.switch_to.default_content()
+            print("******* Error with job " + str(i))
+            print(e)
+            continue
 
 def main():
     options = Options()
