@@ -3,7 +3,6 @@ apache
 cassandra
 c
 c++
-c/c++
 css
 python
 docker
@@ -46,3 +45,4 @@ unix
 Visual basic
 .net
 xpath
+git
