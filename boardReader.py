@@ -7,8 +7,10 @@ from selenium.webdriver.firefox.options import Options
 import time
 from collections import Counter
 import re
-#----------------------------------#
-#         Selenium functions
+import matplotlib.pyplot as plt; plt.rcdefaults()
+import numpy as np
+import matplotlib.pyplot as plt, mpld3
+
 
 # Pull the info from the browser
 # Returns a list of companies and titles elements
@@ -48,6 +50,7 @@ def printPageInfo(companies, titles, descriptions):
             print(e)
             continue
 
+# Take an input file and make a counter initilized to 0 for each word in the languages file. 
 def createLanguageCounter(fileLocation):
     wordCounter = Counter()
     with open(fileLocation, 'r') as languageFile:
@@ -56,6 +59,7 @@ def createLanguageCounter(fileLocation):
     languageFile.close()
     return wordCounter
 
+# Traverse each job description for keywords. 
 def getWordCount(wordCounter, descriptions):
     for job in descriptions:
         job = re.sub(r"[,.;@#?!&$/]+\ *", " ", job)
@@ -63,6 +67,18 @@ def getWordCount(wordCounter, descriptions):
             if word in wordCounter:
                 wordCounter[word] +=1
     return wordCounter
+
+def displayGraph(wordCounter):
+    labels, values = zip(*(wordCounter.most_common()))
+    y_pos = np.arange(len(wordCounter))
+    plt.bar(y_pos, values, align='center', alpha=0.5)
+    plt.xticks(y_pos, labels, rotation=60)
+    plt.tight_layout()
+    plt.title('Software Engineer')
+    plt.ylabel('Occurances')
+    plt.xlabel('Languages')
+    plt.show()
+
 def main():
     options = Options()
     options.headless = True    
@@ -72,11 +88,14 @@ def main():
     
     resultsCol = webBrowser.find_element_by_id('resultsCol')
     companies, titles, descriptions = getInfo(webBrowser, resultsCol)
-    #  maybe pages = [(companies, titles, descriptions)]
-    printPageInfo(companies, titles, descriptions)
+
     wordCounter = createLanguageCounter('languages.txt')
-    wordCounter = getWordCount(counter, descriptions)
+    wordCounter = getWordCount(wordCounter, descriptions)
+    
+    wordCounter += Counter() # Removing 0 elements
     print(wordCounter)
+
+    displayGraph(wordCounter)
     webBrowser.quit()
 
     
