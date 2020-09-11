@@ -68,7 +68,7 @@ def getWordCount(wordCounter, descriptions):
                 wordCounter[word] +=1
     return wordCounter
 
-# Display the graph in sorted order, with language names at the bottom. 
+# Display the graph in sorted order, with language names at the bottom.
 def displayGraph(wordCounter, title, location):
     labels, values = zip(*(wordCounter.most_common()))
     y_pos = np.arange(len(wordCounter))
@@ -81,8 +81,8 @@ def displayGraph(wordCounter, title, location):
     plt.show()
 
 def main(argv):
-    titleSearch = "Software+Engineer"
-    locationSearch = "San+Jose+CA"
+    titleSearch = []
+    locationSearch = []
     try:
         opts, args = getopt.getopt(argv, "t:l:")
     except Exception as e:
