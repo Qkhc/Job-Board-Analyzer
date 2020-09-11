@@ -10,6 +10,7 @@ import re
 import matplotlib.pyplot as plt; plt.rcdefaults()
 import numpy as np
 import matplotlib.pyplot as plt, mpld3
+import sys, getopt
 
 
 # Pull the info from the browser
@@ -19,7 +20,6 @@ def getInfo(driver, results):
     companies = results.find_elements_by_class_name('company')
     titles = results.find_elements_by_class_name("title")
     descriptions = []
-    print("Getting job descriptions")
     for i in range(len(companies)):
         try:
             titles[i].click()
@@ -68,25 +68,47 @@ def getWordCount(wordCounter, descriptions):
                 wordCounter[word] +=1
     return wordCounter
 
-def displayGraph(wordCounter):
+# Display the graph in sorted order, with language names at the bottom. 
+def displayGraph(wordCounter, title, location):
     labels, values = zip(*(wordCounter.most_common()))
     y_pos = np.arange(len(wordCounter))
     plt.bar(y_pos, values, align='center', alpha=0.5)
     plt.xticks(y_pos, labels, rotation=60)
     plt.tight_layout()
-    plt.title('Software Engineer')
+    plt.title(title + " in " + location)
     plt.ylabel('Occurances')
     plt.xlabel('Languages')
     plt.show()
 
-def main():
+def main(argv):
+    titleSearch = "Software+Engineer"
+    locationSearch = "San+Jose+CA"
+    try:
+        opts, args = getopt.getopt(argv, "t:l:")
+    except Exception as e:
+        print("boardReader.py -t [title] -l [location]")
+        print(e)
+        sys.exit(2)
+
+    for opt, arg in opts:
+        if opt == '-t':
+            titleSearch = arg.split()
+            titleSearch = "+".join(titleSearch)
+        if opt == '-l':
+            locationSearch = arg.split()
+            locationSearch = "+".join(locationSearch)
+
+    
+
     options = Options()
     options.headless = True    
     webBrowser = webdriver.Firefox(options=options)
-    URL = "https://www.indeed.com/jobs?q=software+engineer&l=San+Jose%2C+CA"
+    URL = "https://www.indeed.com/jobs?q=" + titleSearch + "&l=" + locationSearch
     webBrowser.get(URL)
     
     resultsCol = webBrowser.find_element_by_id('resultsCol')
+    
+    print("Getting job info for " + titleSearch + " in " + locationSearch)
     companies, titles, descriptions = getInfo(webBrowser, resultsCol)
 
     wordCounter = createLanguageCounter('languages.txt')
@@ -95,12 +117,12 @@ def main():
     wordCounter += Counter() # Removing 0 elements
     print(wordCounter)
 
-    displayGraph(wordCounter)
+    displayGraph(wordCounter, titleSearch, locationSearch)
     webBrowser.quit()
 
     
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1:])
 
 
 # indeed id="jobDescriptionText" under auxCol
