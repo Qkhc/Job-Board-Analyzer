@@ -74,10 +74,11 @@ def displayGraph(wordCounter, title, location):
     y_pos = np.arange(len(wordCounter))
     plt.bar(y_pos, values, align='center', alpha=0.5)
     plt.xticks(y_pos, labels, rotation=60)
-    plt.tight_layout()
+    # plt.tight_layout()
     plt.title(title + " in " + location)
     plt.ylabel('Occurances')
     plt.xlabel('Languages')
+    plt.savefig('graph.jpg', bbox_inches='tight')
     plt.show()
 
 def main(argv):
@@ -92,9 +93,11 @@ def main(argv):
 
     for opt, arg in opts:
         if opt == '-t':
+            title = arg
             titleSearch = arg.split()
             titleSearch = "+".join(titleSearch)
         if opt == '-l':
+            location = arg
             locationSearch = arg.split()
             locationSearch = "+".join(locationSearch)
 
@@ -108,7 +111,7 @@ def main(argv):
     
     resultsCol = webBrowser.find_element_by_id('resultsCol')
     
-    print("Getting job info for " + titleSearch + " in " + locationSearch)
+    print("Getting job info for " + title + " in " + location)
     companies, titles, descriptions = getInfo(webBrowser, resultsCol)
 
     wordCounter = createLanguageCounter('languages.txt')
@@ -117,7 +120,7 @@ def main(argv):
     wordCounter += Counter() # Removing 0 elements
     print(wordCounter)
 
-    displayGraph(wordCounter, titleSearch, locationSearch)
+    displayGraph(wordCounter, title, location)
     webBrowser.quit()
 
     
