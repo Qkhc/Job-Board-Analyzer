@@ -5,5 +5,9 @@ This uses selenium to open a headless Firefox browser and scans each job posting
 ## Usage
 This program is simple CLI to run.
 ` python3 boardReader.py -t [title] -l [location] ` \
-Example: ``` python3 boardReader.py -t "Software Engineer" -l "San Jose CA" ``` will search Indeed.com and examine each job posting. Each job posting will be scanned for the keywords listed in `languages.txt`and a count for each one will be kept. Keywords that do not appear in any job postings will not be included in the results. \
-Finally, a simple bar graph will be displayed with the results. 
+Example: ``` python3 boardReader.py -t "Software Engineer" -l "San Jose CA" ``` will search Indeed.com and examine each job posting. Each job posting will be scanned for the keywords listed in `languages.txt`and a count for each one will be kept. Keywords that do not appear in any job postings will not be included in the results.
+
+Finally, a simple bar graph will be displayed with the results.
+
+Here are the results for 1 page of Software Engineer job postings in San Jose CA, with the provided lanugages file. 
+![](graph.jpg)
