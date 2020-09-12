@@ -46,3 +46,5 @@ Visual basic
 .net
 xpath
 git
+go
+golang
