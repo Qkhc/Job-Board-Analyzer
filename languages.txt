@@ -42,9 +42,10 @@ nosql
 swift
 tex
 unix
-Visual basic
+visual basic
 .net
 xpath
 git
 go
 golang
+kubernetes

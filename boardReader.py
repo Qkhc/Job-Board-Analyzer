@@ -17,12 +17,13 @@ import sys, getopt
 # Returns a list of companies and titles elements
 # as well as the job description text
 def getInfo(driver, results):
+    descriptions = []
     companies = results.find_elements_by_class_name('company')
     titles = results.find_elements_by_class_name("title")
-    descriptions = []
     for i in range(len(companies)):
         try:
-            titles[i].click()
+            # titles[i].click()
+            driver.execute_script("arguments[0].click();", titles[i])
             time.sleep(.5)
             driver.switch_to.frame('vjs-container-iframe')
             time.sleep(1.5)
@@ -34,7 +35,6 @@ def getInfo(driver, results):
             print("******* Error getting job " + str(i))
             print(e)
             continue
-
     return companies, titles, descriptions
 
 # Print the company, job title, and the job description for a single page. 
@@ -114,12 +114,23 @@ def main(argv):
     print("Getting job info for " + title + " in " + location)
     companies, titles, descriptions = getInfo(webBrowser, resultsCol)
 
+    # nextPage = driver.find_elements_by_class_name("np")
+    # print("page 2")
+    for i in range(0,3):
+        print("next page")
+        nextPage = webBrowser.find_element_by_xpath("/html/body/table[2]/tbody/tr/td/table/tbody/tr/td[1]/nav/div/ul/li[6]")
+        webBrowser.execute_script("arguments[0].click();", nextPage)
+        resultsCol = webBrowser.find_element_by_id('resultsCol')
+
+        companies2, titles2, descriptions2 = getInfo(webBrowser, resultsCol)
+
+        descriptions += descriptions2
+    
     wordCounter = createLanguageCounter('languages.txt')
     wordCounter = getWordCount(wordCounter, descriptions)
     
     wordCounter += Counter() # Removing 0 elements
     print(wordCounter)
-
     displayGraph(wordCounter, title, location)
     webBrowser.quit()
 
