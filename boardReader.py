@@ -22,15 +22,15 @@ def getInfo(driver, results):
     titles = results.find_elements_by_class_name("title")
     for i in range(len(companies)):
         try:
-            # titles[i].click()
             driver.execute_script("arguments[0].click();", titles[i])
-            time.sleep(.5)
+            time.sleep(1)
             driver.switch_to.frame('vjs-container-iframe')
             time.sleep(1.5)
             jobDes = driver.find_element_by_xpath('//*[@id="jobDescriptionText"]')
             descriptions.append(jobDes.text.lower())
             driver.switch_to.default_content()
         except Exception as e:
+            descriptions.append("")
             driver.switch_to.default_content()
             print("******* Error getting job " + str(i))
             print(e)
@@ -69,77 +69,95 @@ def getWordCount(wordCounter, descriptions):
     return wordCounter
 
 # Display the graph in sorted order, with language names at the bottom.
-def displayGraph(wordCounter, title, location):
+def displayGraph(wordCounter, title, location, pages):
     labels, values = zip(*(wordCounter.most_common()))
     y_pos = np.arange(len(wordCounter))
     plt.bar(y_pos, values, align='center', alpha=0.5)
-    plt.xticks(y_pos, labels, rotation=60)
-    # plt.tight_layout()
+    plt.xticks(y_pos, labels, rotation=90)
     plt.title(title + " in " + location)
-    plt.ylabel('Occurances')
+    plt.ylabel("Occurances over " + str(pages) + " page(s). ")
     plt.xlabel('Languages')
     plt.savefig('graph.jpg', bbox_inches='tight')
     plt.show()
 
+# Create the counter
+# Look through the job descriptions and count the words
+# remove entries with 0 count
+# return the counter
+def doAnalysis(descriptions):
+    wordCounter = createLanguageCounter('languages.txt')
+    wordCounter = getWordCount(wordCounter, descriptions)
+    wordCounter += Counter() # Removes 0 elements
+    return wordCounter
+
 def main(argv):
     titleSearch = []
     locationSearch = []
+    numPages = 1
+    verbose = False
+    
+    # Get command line args
     try:
-        opts, args = getopt.getopt(argv, "t:l:")
+        opts, args = getopt.getopt(argv, "vt:l:n:")
     except Exception as e:
-        print("boardReader.py -t [title] -l [location]")
+        print("boardReader.py -t [title] -l [location] -n [number]")
         print(e)
         sys.exit(2)
 
     for opt, arg in opts:
+        # Job title
         if opt == '-t':
             title = arg
             titleSearch = arg.split()
             titleSearch = "+".join(titleSearch)
+        # Job location
         if opt == '-l':
             location = arg
             locationSearch = arg.split()
             locationSearch = "+".join(locationSearch)
+        # Number of pages
+        if opt == '-n':
+            numPages = int(arg)
+        if opt == '-v':
+            verbose = True
 
-    
-
+    # Start firefox browser and go to indeed.com and search for a job
     options = Options()
     options.headless = True    
     webBrowser = webdriver.Firefox(options=options)
     URL = "https://www.indeed.com/jobs?q=" + titleSearch + "&l=" + locationSearch
     webBrowser.get(URL)
+    print("Getting job info for " + title + " in " + location + " across " + str(numPages) + " pages.")
     
+    # First page analysis, breaks when put inside loop
+    # TODO Fix to put all pages in a single loop. 
+    print("---------- Page 1 starting. ----------")
     resultsCol = webBrowser.find_element_by_id('resultsCol')
-    
-    print("Getting job info for " + title + " in " + location)
     companies, titles, descriptions = getInfo(webBrowser, resultsCol)
+    if verbose:
+        printPageInfo(companies, titles, descriptions)
+    print("---------- Page 1 finished. ----------\n")
 
-    # nextPage = driver.find_elements_by_class_name("np")
-    # print("page 2")
-    for i in range(0,3):
-        print("next page")
+    # Go through the next n-1 pages and get each job info
+    for i in range(0,numPages-1):
+        print("---------- Page " + str(i + 2) + " starting. ----------")
         nextPage = webBrowser.find_element_by_xpath("/html/body/table[2]/tbody/tr/td/table/tbody/tr/td[1]/nav/div/ul/li[6]")
         webBrowser.execute_script("arguments[0].click();", nextPage)
         resultsCol = webBrowser.find_element_by_id('resultsCol')
-
         companies2, titles2, descriptions2 = getInfo(webBrowser, resultsCol)
-
         descriptions += descriptions2
-    
-    wordCounter = createLanguageCounter('languages.txt')
-    wordCounter = getWordCount(wordCounter, descriptions)
-    
-    wordCounter += Counter() # Removing 0 elements
-    print(wordCounter)
-    displayGraph(wordCounter, title, location)
+        if verbose:
+            printPageInfo(companies2, titles2, descriptions2)
+        print("---------- Page " + str(i + 2) + " finished. ----------\n")
+
+    # Go through each description and count the words. 
+    wordCounter = doAnalysis(descriptions)
+    if verbose:
+        print(wordCounter)
+    # Save the graph to 'graph.jpg' for viewing. 
+    displayGraph(wordCounter, title, location, numPages)
     webBrowser.quit()
 
     
 if __name__ == '__main__':
     main(sys.argv[1:])
-
-
-# indeed id="jobDescriptionText" under auxCol
-# indeed tr role = main
-#td id = resultsCol
-# div id = pj_123456789

@@ -49,3 +49,5 @@ git
 go
 golang
 kubernetes
+mysql
+postgresql
