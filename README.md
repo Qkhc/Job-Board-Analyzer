@@ -13,12 +13,11 @@ Here are the results for 10 pages of Software Engineer job postings in San Jose 
 ![](graph.jpg)
 
 Here is a quick graphic on the possible arguments.
-------------------------------------
-Long arg     Short arg    With value  
-------------------------------------
---title      -t           yes         
---location   -l           yes         
---number     -n           yes         
---verbose    -v           no          
---help       -h           no          
-------------------------------------
+
+| Long Argument | Short Argument | Requires Value |
+|---------------|----------------|----------------|
+| --title       | -t             | yes            |
+| --location    | -l             | yes            |
+| --number      | -n             | yes            |
+| --verbose     | -v             | no             |
+| --help        | -h             | no             |        
