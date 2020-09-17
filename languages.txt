@@ -43,7 +43,7 @@ swift
 tex
 unix
 visual basic
-.net
+net
 xpath
 git
 go

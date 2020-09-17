@@ -90,36 +90,54 @@ def doAnalysis(descriptions):
     wordCounter += Counter() # Removes 0 elements
     return wordCounter
 
+# Prints the help info. 
+def help():
+    print("Usage: boardReader.py [-h] [-v] [-n number] -l=<location> -t=<title>")
+    print("------------------------------------")
+    print(f"{'Long arg':<12} {'Short arg':<12} {'With value':<12}")
+    print("------------------------------------")
+    print(f"{'--title':<12} {'-t':<12} {'yes':<12}")
+    print(f"{'--location':<12} {'-l':<12} {'yes':<12}")
+    print(f"{'--number':<12} {'-n':<12} {'yes':<12}")
+    print(f"{'--verbose':<12} {'-v':<12} {'no':<12}")
+    print(f"{'--help':<12} {'-h':<12} {'no':<12}")
+    print("------------------------------------")
+
 def main(argv):
-    titleSearch = []
-    locationSearch = []
+    titleSearch = "Software+Engineer"
+    title = "Software Engineer"
+    locationSearch = "San Jose CA"
+    location = "San Jose CA"
     numPages = 1
     verbose = False
     
     # Get command line args
     try:
-        opts, args = getopt.getopt(argv, "vt:l:n:")
+        opts, args = getopt.getopt(argv, "vht:l:n:", ["verbose", "help", "title=", "location=", "number="])  
     except Exception as e:
-        print("boardReader.py -t [title] -l [location] -n [number]")
+        print("Usage: boardReader.py [-v] [-n number] -l=<location> -t=<title>")
         print(e)
         sys.exit(2)
 
     for opt, arg in opts:
         # Job title
-        if opt == '-t':
+        if opt in ("-t", "--title"):
             title = arg
             titleSearch = arg.split()
             titleSearch = "+".join(titleSearch)
         # Job location
-        if opt == '-l':
+        elif opt in ('-l', '--location'):
             location = arg
             locationSearch = arg.split()
             locationSearch = "+".join(locationSearch)
         # Number of pages
-        if opt == '-n':
+        elif opt in ('-n', 'number'):
             numPages = int(arg)
-        if opt == '-v':
+        elif opt in ('-v', "--verbose"):
             verbose = True
+        elif opt in ('-h', '--help'):
+            help()
+            sys.exit(2)
 
     # Start firefox browser and go to indeed.com and search for a job
     options = Options()
@@ -139,7 +157,7 @@ def main(argv):
     print("---------- Page 1 finished. ----------\n")
 
     # Go through the next n-1 pages and get each job info
-    for i in range(0,numPages-1):
+    for i in range(0, numPages-1):
         print("---------- Page " + str(i + 2) + " starting. ----------")
         nextPage = webBrowser.find_element_by_xpath("/html/body/table[2]/tbody/tr/td/table/tbody/tr/td[1]/nav/div/ul/li[6]")
         webBrowser.execute_script("arguments[0].click();", nextPage)
@@ -158,6 +176,5 @@ def main(argv):
     displayGraph(wordCounter, title, location, numPages)
     webBrowser.quit()
 
-    
 if __name__ == '__main__':
     main(sys.argv[1:])
