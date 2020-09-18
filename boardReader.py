@@ -110,7 +110,7 @@ def startSearch(webBrowser, numPages, verbose):
 
 # Prints the help info. 
 def help():
-    print("Usage: boardReader.py [-h] [-v] [-n number] -l=<location> -t=<title>")
+    print("Usage: boardReader.py [-h] [-v] [-n number] -l <location> -t <title>")
     print("------------------------------------")
     print(f"{'Long arg':<12} {'Short arg':<12} {'With value':<12}")
     print("------------------------------------")
@@ -133,7 +133,7 @@ def main(argv):
     try:
         opts, args = getopt.getopt(argv, "vht:l:n:", ["verbose", "help", "title=", "location=", "number="])  
     except Exception as e:
-        print("Usage: boardReader.py [-v] [-n number] -l=<location> -t=<title>")
+        help()
         print(e)
         sys.exit(2)
 
