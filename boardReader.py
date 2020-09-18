@@ -63,7 +63,9 @@ def createLanguageCounter(fileLocation):
 def getWordCount(wordCounter, descriptions):
     for job in descriptions:
         job = re.sub(r"[,.;@#?!&$/]+\ *", " ", job)
-        for word in job.split():
+        job = job.split()
+        new_job_list = list(dict.fromkeys(job)) # Removes duplicates
+        for word in new_job_list:
             if word in wordCounter:
                 wordCounter[word] +=1
     return wordCounter
