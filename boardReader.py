@@ -25,7 +25,7 @@ def getInfo(driver, results):
             driver.execute_script("arguments[0].click();", titles[i])
             time.sleep(1)
             driver.switch_to.frame('vjs-container-iframe')
-            time.sleep(1.5)
+            time.sleep(0.5)
             jobDes = driver.find_element_by_xpath('//*[@id="jobDescriptionText"]')
             descriptions.append(jobDes.text.lower())
             driver.switch_to.default_content()
@@ -90,6 +90,22 @@ def doAnalysis(descriptions):
     wordCounter += Counter() # Removes 0 elements
     return wordCounter
 
+# Go through the number of pages and get each job description. 
+def startSearch(webBrowser, numPages, verbose):
+    descriptions = []
+    # Go through the next n-1 pages and get each job info
+    for i in range(0, numPages):
+        print("---------- Page " + str(i + 1) + " starting. ----------")
+        resultsCol = webBrowser.find_element_by_id('resultsCol')
+        companies2, titles2, descriptions2 = getInfo(webBrowser, resultsCol)
+        descriptions += descriptions2
+        if verbose:
+            printPageInfo(companies2, titles2, descriptions2)
+        nextPage = webBrowser.find_element_by_xpath("/html/body/table[2]/tbody/tr/td/table/tbody/tr/td[1]/nav/div/ul/li[6]")
+        webBrowser.execute_script("arguments[0].click();", nextPage)
+        print("---------- Page " + str(i + 1) + " finished. ----------\n")
+    return descriptions
+
 # Prints the help info. 
 def help():
     print("Usage: boardReader.py [-h] [-v] [-n number] -l=<location> -t=<title>")
@@ -106,7 +122,7 @@ def help():
 def main(argv):
     titleSearch = "Software+Engineer"
     title = "Software Engineer"
-    locationSearch = "San Jose CA"
+    locationSearch = "San+Jose+CA"
     location = "San Jose CA"
     numPages = 1
     verbose = False
@@ -131,7 +147,7 @@ def main(argv):
             locationSearch = arg.split()
             locationSearch = "+".join(locationSearch)
         # Number of pages
-        elif opt in ('-n', 'number'):
+        elif opt in ('-n', '--number'):
             numPages = int(arg)
         elif opt in ('-v', "--verbose"):
             verbose = True
@@ -147,26 +163,8 @@ def main(argv):
     webBrowser.get(URL)
     print("Getting job info for " + title + " in " + location + " across " + str(numPages) + " pages.")
     
-    # First page analysis, breaks when put inside loop
-    # TODO Fix to put all pages in a single loop. 
-    print("---------- Page 1 starting. ----------")
-    resultsCol = webBrowser.find_element_by_id('resultsCol')
-    companies, titles, descriptions = getInfo(webBrowser, resultsCol)
-    if verbose:
-        printPageInfo(companies, titles, descriptions)
-    print("---------- Page 1 finished. ----------\n")
-
-    # Go through the next n-1 pages and get each job info
-    for i in range(0, numPages-1):
-        print("---------- Page " + str(i + 2) + " starting. ----------")
-        nextPage = webBrowser.find_element_by_xpath("/html/body/table[2]/tbody/tr/td/table/tbody/tr/td[1]/nav/div/ul/li[6]")
-        webBrowser.execute_script("arguments[0].click();", nextPage)
-        resultsCol = webBrowser.find_element_by_id('resultsCol')
-        companies2, titles2, descriptions2 = getInfo(webBrowser, resultsCol)
-        descriptions += descriptions2
-        if verbose:
-            printPageInfo(companies2, titles2, descriptions2)
-        print("---------- Page " + str(i + 2) + " finished. ----------\n")
+    # Get all the job descriptions across all pages. 
+    descriptions = startSearch(webBrowser, numPages, verbose)
 
     # Go through each description and count the words. 
     wordCounter = doAnalysis(descriptions)
